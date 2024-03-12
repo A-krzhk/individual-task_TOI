@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <string>
 #include <random>
+ 
 
 using namespace std;
 
@@ -77,7 +78,7 @@ void BubblePriceSort(Price products[], int n) {
                 Price temp = products[j];
                 products[j] = products[j + 1];
                 products[j + 1] = temp;
-                std::swap(products[j], products[j + 1]); //swap - меняет местами значения переменных
+                
             }
         }
     }
@@ -87,8 +88,10 @@ void BubblePriceSort(Price products[], int n) {
 void BubbleRateSort(Rate products[], int n) {
     for (int i{ 0 }; i < n - 1; ++i) {
         for (int j{ 0 }; j < n - i - 1; ++j) {
-            if (products[j].rate < products[j + 1].rate) {
-                std::swap(products[j], products[j + 1]);
+            if (products[j].rate >  products[j + 1].rate) {
+                Rate temp = products[j];
+                products[j] = products[j + 1];
+                products[j + 1] = temp;
             }
         }
     }
@@ -278,7 +281,119 @@ PriceNode* deletePriceNode(PriceNode* root, int price) {
 // 
 // 
 
+struct Node { // Определяем структуру Node
+    Product data; // Поле data - структура Person
+    Node* next; // Поле next - указатель на следующий узел
+};
 
+// Функция для вставки данных в отсортированный по ID связанный список
+void insertSorted(Node*& head, const Product& newData) {
+    Node* newNode = new Node;   // Создание нового узла
+    newNode->data = newData;    // Присвоение новым данным
+    newNode->next = nullptr;    // Новый узел пока не связан с другими
+
+    // Если список пуст или первый элемент имеет ID больше или равный новому, вставляем новый элемент в начало списка
+    if (head == nullptr || head->data.id >= newData.id) {
+        newNode->next = head; // Связываем новый узел со старым началом списка
+        head = newNode;       // Новый узел становится началом списка
+        return;               // Завершаем функцию
+    }
+
+    // Поиск места для вставки нового узла
+    Node* current = head;
+    while (current->next != nullptr && current->next->data.id < newData.id) {
+        current = current->next;
+    }
+
+    // Вставка нового узла
+    newNode->next = current->next;
+    current->next = newNode;
+}
+
+
+
+// Функция для поиска и вывода товаров по ID
+void searchAndDisplayByAttributeValue(Node* head, int targetId) {
+    Node* current = head;
+    bool found = false;
+
+    // Поиск товаров по ID и вывод 
+    while (current != nullptr) {
+        if (current->data.id == targetId) {
+            found = true;
+            std::cout << "Найден товар с ID " << targetId << ":" << std::endl;
+            std::cout << "Название: " << current->data.name << ", Цена: " << current->data.price << ", Рейтинг: "
+                << current->data.rate << ", ID: " << current->data.id << std::endl;
+        }
+        current = current->next;
+    }
+
+    // Если товар с указанным ID не найден
+    if (!found) {
+        std::cout << "Товар с ID " << targetId << " не найден." << std::endl;
+    }
+}
+
+//Удаление элемента
+void removeNodeByID(Node*& head, int id) {
+    if (head == nullptr) {
+        return;
+    }
+    Node* current = head;
+    while (current != nullptr && current->data.id != id) {
+        current = current->next;
+    }
+    if (current != nullptr) {
+        Node* prev = head;
+        while (prev->next != current) {
+            prev = prev->next;
+        }
+        prev->next = current->next;
+    }
+}
+
+// Функция для вывода всего списка товаров
+void printList(Node* head) {
+    Node* current = head;
+
+    // Вывод данных каждого узла списка
+    while (current != nullptr) {
+        std::cout << "Название: " << current->data.name << ", Цена: " << current->data.price << ", Рейтинг: " << current->data.rate << ", ID: " << current->data.id << std::endl;
+        current = current->next;
+    }
+}
+
+//функция для рандомного заполнения линейного списка товаров 
+void randomInputData(Node*& head, int amount) {
+    std::string Names[11] = { "Ноутбук", "Фен", "Кофеварка", "Телевизор", "Компьютер", "Мышка", "Клавиатура", "Колонка", "Наушники", "Стол", "Проектор" };
+
+    // Генерация и вставка случайных товаров
+    for (int i = 0; i < amount; ++i) {
+        Product productsList = { Random(100, 1000), Names[Random(0, 10)], Random(1, 10000), Random(1, 5) };
+        insertSorted(head, productsList);
+    }
+}
+
+//// Сортировка по ID и вывод каждого узла
+//void printSorted(Node* head) {
+//    if (head == nullptr) {
+//        return;
+//    }
+//    Node* current = head;
+//    while (current != nullptr) {
+//        Node* next = current->next;
+//        while (next != nullptr && next->data.id < current->data.id) {
+//            next = next->next;
+//        }
+//        current->next = next;
+//        current = next;
+//    }
+//    current = head;
+//    while (current != nullptr) {
+//        std::cout << "Название: " << current->data.name << ", Цена: " << current->data.price << ", Рейтинг: " << current->data.rate << ", ID: " << current->data.id << std::endl;
+//        current = current->next;
+//    }
+//}
 int main() {
     //
     // 
@@ -288,17 +403,15 @@ int main() {
     // 
 
     setlocale(LC_ALL, "Russian");
-    int arraySize = 6; // Размер массива 
+    int arraySize = 10; // Размер массива 
     Product* products = new Product[arraySize]; // Выделение памяти под массива
     RandomInputData(products, arraySize); // Заполнение массива случайными данными
     //InputData(products, arraySize); //заполнение массива вручную
 
     // Вывод индексированного массива по цене
-    std::cout << "****************************)" << std::endl;
-    std::cout << "****************************)" << std::endl;
+    std::cout << "\n****************************" << std::endl;
     std::cout << "Индексирование №1. (По цене)" << std::endl;
-    std::cout << "****************************)" << std::endl;
-    std::cout << "****************************)" << std::endl;
+    std::cout << "**************************** \n" << std::endl;
     Price* priceIndex = new Price[arraySize];
 
     for (int i = 0; i < arraySize; ++i) {
@@ -313,11 +426,9 @@ int main() {
     std::cout << "Индекс:" << BinarySearchRecursive(priceIndex, 0, arraySize, 290);
 
     // Инндексирование по величине рейтинга
-    std::cout << "****************************)" << std::endl;
-    std::cout << "****************************)" << std::endl;
+    std::cout << "\n****************************" << std::endl;
     std::cout << "Индексирование №2. (По рейтингу)" << std::endl;
-    std::cout << "****************************)" << std::endl;
-    std::cout << "****************************)" << std::endl;
+    std::cout << "**************************** \n" << std::endl;
     Rate* rateIndex = new Rate[arraySize];
     for (int i = 0; i < arraySize; ++i) {
         rateIndex[i].rate = products[i].rate;
@@ -331,11 +442,9 @@ int main() {
     std::cout << "Индекс:" << IterativeRateSearch(rateIndex, arraySize, 290);
 
     // Сортировка массива индексов для цены
-    std::cout << "****************************)" << std::endl;
-    std::cout << "****************************)" << std::endl;
+    std::cout << "\n****************************" << std::endl;
     std::cout << "Сортировка массива для цены" << std::endl;
-    std::cout << "****************************)" << std::endl;
-    std::cout << "****************************)" << std::endl;
+    std::cout << "**************************** \n" << std::endl;
     BubblePriceSort(priceIndex, arraySize);
 
     for (int i = 0; i < arraySize; ++i) {
@@ -347,51 +456,45 @@ int main() {
     }
 
     // Сортировка массива индексов для рейтинга
-    std::cout << "****************************)" << std::endl;
-    std::cout << "****************************)" << std::endl;
+    std::cout << "\n****************************" << std::endl;
     std::cout << "Сортировка массива для рейтинга" << std::endl;
-    std::cout << "****************************)" << std::endl;
-    std::cout << "****************************)" << std::endl;
+    std::cout << "**************************** \n" << std::endl;
     BubbleRateSort(rateIndex, arraySize);
     for (int i = 0; i < arraySize; ++i) {
+        products[i].rate = rateIndex[i].rate;
+        rateIndex[i].index = i;
+
         std::cout << "Название: " << products[i].name << ", Цена: " << products[i].price <<
             ", Рейтинг: " << products[i].rate << ", ID: " << products[i].id
             << ", Index: " << rateIndex[i].index << std::endl;
     }
 
     // Изменение значения силы и соответствующего индекса
-    std::cout << "****************************)" << std::endl;
-    std::cout << "****************************)" << std::endl;
+    std::cout << "\n****************************" << std::endl;
     std::cout << "Изменение массива индексов для цены" << std::endl;
-    std::cout << "****************************)" << std::endl;
-    std::cout << "****************************)" << std::endl;
+    std::cout << "**************************** \n" << std::endl;
     EditPriceRecord(products, priceIndex, arraySize, 4, 324);
     PrintArray(products, arraySize);
 
     // Изменение значения уровня и соответствующего индекса
-    std::cout << "****************************)" << std::endl;
-    std::cout << "****************************)" << std::endl;
+    std::cout << "\n****************************" << std::endl;
     std::cout << "Изменение массива индексов для рейтинга" << std::endl;
-    std::cout << "****************************)" << std::endl;
-    std::cout << "****************************)" << std::endl;
+    std::cout << "**************************** \n" << std::endl;
     RateRecord(products, rateIndex, arraySize, 4, 10000);
     PrintArray(products, arraySize);
 
     // Удаление записи по ключу из массива покемонов и массива индексов для силы
-    std::cout << "****************************)" << std::endl;
-    std::cout << "****************************)" << std::endl;
+    std::cout << "\n****************************" << std::endl;
     std::cout << "Удаление массива индексов для цены" << std::endl;
-    std::cout << "****************************)" << std::endl;
-    std::cout << "****************************)" << std::endl;
+    std::cout << "**************************** \n" << std::endl;
     RemoveRecordByKey(products, priceIndex, arraySize, 0);
     PrintArray(products, arraySize);
 
     // Удаление записи по ключу из массива покемонов и массива индексов для уровня
-    std::cout << "****************************)" << std::endl;
-    std::cout << "****************************)" << std::endl;
+
+    std::cout << "\n****************************" << std::endl;
     std::cout << "Удаление массива индексов для рейтинга" << std::endl;
-    std::cout << "****************************)" << std::endl;
-    std::cout << "****************************)" << std::endl;
+    std::cout << "**************************** \n" << std::endl;
     DeleteRateRecord(products, rateIndex, arraySize, 2);
     PrintArray(products, arraySize);
 
@@ -473,7 +576,7 @@ int main() {
         std::cout << "Товар с такой ценой не найден." << std::endl;
     }
 
-    // Удаляем товар по цене
+    // Удаляем товар по id
     int deletePower;
     std::cout << "Введите цену товара для удаления: ";
     std::cin >> deletePower;
@@ -489,9 +592,50 @@ int main() {
         root = deletePriceNode(root, deletePower);
     }
     else {
-        std::cout << "Товар с такой ценой не найден." << std::endl;
+        std::cout << "Товар с таким ID не найден." << std::endl;
     }
     std::cout << "Товары по цене в порядке возрастания:" << std::endl;
     printProductsByPrice(products1, size, root);
+
+
+    //
+    // 
+    // 
+    // ЗАДАНИЕ 3
+    // 
+    // 
+
+
+    Node* head = nullptr; // Указатель на начало списка
+    int amount;
+    std::cout << "Введите количество товаров: ";
+    std::cin >> amount;
+
+    randomInputData(head, amount); // Генерация случайных данных
+
+    std::cout << "Список всех товаров:" << std::endl;
+    printList(head); // Вывод списка товаров
+
+    int searchId;
+    std::cout << "Введите ID для поиска товара: ";
+    std::cin >> searchId;
+    searchAndDisplayByAttributeValue(head, searchId); // Поиск и вывод товара по ID
+
+    int choiceDel;
+    std::cout << "Введите ID элемента, который хотите удалить (3 задание)";
+    std::cin >> choiceDel;
+    removeNodeByID(head, choiceDel);
+    std::cout << "\nМассив после удаления элемента";
+    printList(head); // Вывод списка товаров
+
+    //Выывод отсортированного списка 
+    std::cout << "\nМассив отсортированный по ID ";
+    //printSorted(head);
+    // Освобождение памяти, выделенной под список
+    while (head != nullptr) {
+        Node* temp = head;
+        head = head->next;
+        delete temp;
+    }
     return 0;
 }
