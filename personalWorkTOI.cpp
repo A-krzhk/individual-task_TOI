@@ -154,13 +154,14 @@ void RateRecord(Product products[], Rate rateIndex[], int n, int recordIndex, in
 }
 
 // Процедура для удаления записи по ключу из массива товаров и массива индексов для цены
-void RemoveRecordByKey(Product* products, Price* powerIndex, int& size, int index) {
+void RemoveRecordByKey(Product* products, Price* priceIndex, int& size, int index) {
     for (int i = index; i < size - 1; ++i) {
         products[i] = products[i + 1];
-        powerIndex[i] = powerIndex[i + 1];
+        priceIndex[i] = priceIndex[i + 1];
     }
     --size;
 }
+
 
 // Процедура для удаления записи по ключу из массива товаров и массива индексов для рейтинга
 void DeleteRateRecord(Product* products, Rate* rateIndex, int& size, int index) {
@@ -232,7 +233,7 @@ void printProductsByPrice(Product products[], int size, PriceNode* root) {
 }
 
 
-// Функция для удаления узла из дерева индексов по силе
+// Функция для удаления узла из дерева индексов по цене
 PriceNode* deletePriceNode(PriceNode* root, int price) {
     if (root == nullptr) {
         return nullptr;
@@ -374,26 +375,6 @@ void randomInputData(Node*& head, int amount) {
     }
 }
 
-//// Сортировка по ID и вывод каждого узла
-//void printSorted(Node* head) {
-//    if (head == nullptr) {
-//        return;
-//    }
-//    Node* current = head;
-//    while (current != nullptr) {
-//        Node* next = current->next;
-//        while (next != nullptr && next->data.id < current->data.id) {
-//            next = next->next;
-//        }
-//        current->next = next;
-//        current = next;
-//    }
-//    current = head;
-//    while (current != nullptr) {
-//        std::cout << "Название: " << current->data.name << ", Цена: " << current->data.price << ", Рейтинг: " << current->data.rate << ", ID: " << current->data.id << std::endl;
-//        current = current->next;
-//    }
-//}
 int main() {
     //
     // 
@@ -589,10 +570,10 @@ int main() {
     }
 
     // Удаляем товар по id
-    int deletePower;
+    int deletePrice;
     std::cout << "Введите цену товара для удаления: ";
-    std::cin >> deletePower;
-    foundNode = searchPriceTree(root, deletePower);
+    std::cin >> deletePrice;
+    foundNode = searchPriceTree(root, deletePrice);
     if (foundNode != nullptr) {
         // Удаляем из массива
         for (int i = foundNode->index; i < size - 1; ++i) {
@@ -601,13 +582,14 @@ int main() {
         --size;
 
         // Удаляем из индекса
-        root = deletePriceNode(root, deletePower);
+        root = deletePriceNode(root, deletePrice);
     }
     else {
         std::cout << "Товар с таким ID не найден." << std::endl;
     }
     std::cout << "Товары по цене в порядке возрастания:" << std::endl;
     printProductsByPrice(products1, size, root);
+
 
 
     //
@@ -638,12 +620,9 @@ int main() {
     std::cout << "Введите ID элемента, который хотите удалить (3 задание)";
     std::cin >> choiceDel;
     removeNodeByID(head, choiceDel);
-    std::cout << "\nМассив после удаления элемента";
+    std::cout << "\nМассив после удаления элемента\n";
     printList(head); // Вывод списка товаров
 
-    //Выывод отсортированного списка 
-    std::cout << "\nМассив отсортированный по ID ";
-    //printSorted(head);
     // Освобождение памяти, выделенной под список
     while (head != nullptr) {
         Node* temp = head;
