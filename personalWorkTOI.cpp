@@ -22,17 +22,17 @@ struct Product {
 
 //Для реализации индексирования создаю еще две структуры
 
-//Индексация по полю цены
-struct Price {
-    int price;
-    int index;
-};
+    //Индексация по полю цены
+    struct Price {
+        int price;
+        int index;
+    };
 
-//Индексация по полю рейтинга товара
-struct Rate {
-    int rate;
-    int index;
-};
+    //Индексация по полю рейтинга товара
+    struct Rate {
+        int rate;
+        int index;
+    };
 
 // Процедура для печати массива товаров
 void PrintArray(Product products[], int n) {
@@ -226,7 +226,7 @@ PriceNode* searchPriceTree(PriceNode* root, int price) {
 void printProductsByPrice(Product products[], int size, PriceNode* root) {
     if (root != nullptr) {
         printProductsByPrice(products, size, root->left);
-        std::cout << "Название: " << products[root->index].name << ", Цена: " << products[root->index].price << ", Рейтинг: " << products[root->index].rate << ", ID: " << products[root->index].id << std::endl << std::endl;
+        std::cout << "Название: " << products[root->index].name << ", Цена: " << products[root->index].price << ", Рейтинг: " << products[root->index].rate << ", ID: " << products[root->index].id << std::endl;
         printProductsByPrice(products, size, root->right);
     }
 }
@@ -438,14 +438,18 @@ int main() {
             << ", Index: " << rateIndex[i].index << std::endl;
     }
  
-    // Поиск индекса по значению уровня (итеративный)
-    std::cout << "Индекс:" << IterativeRateSearch(rateIndex, arraySize, 290);
+    // Поиск индекса по значению рейтинга (итеративный)
+    std::cout << "Индекс:" << IterativeRateSearch(rateIndex, arraySize, 3);
 
     // Сортировка массива индексов для цены
     std::cout << "\n****************************" << std::endl;
     std::cout << "Сортировка массива для цены" << std::endl;
     std::cout << "**************************** \n" << std::endl;
     BubblePriceSort(priceIndex, arraySize);
+    Product* tempProducts = new Product[arraySize];
+    for (int i = 0; i < arraySize; ++i) {
+        tempProducts[i] = products[priceIndex[i].index];
+    }
 
     for (int i = 0; i < arraySize; ++i) {
         products[i].price = priceIndex[i].price;
@@ -460,37 +464,44 @@ int main() {
     std::cout << "Сортировка массива для рейтинга" << std::endl;
     std::cout << "**************************** \n" << std::endl;
     BubbleRateSort(rateIndex, arraySize);
-    for (int i = 0; i < arraySize; ++i) {
-        products[i].rate = rateIndex[i].rate;
-        rateIndex[i].index = i;
 
-        std::cout << "Название: " << products[i].name << ", Цена: " << products[i].price <<
-            ", Рейтинг: " << products[i].rate << ", ID: " << products[i].id
-            << ", Index: " << rateIndex[i].index << std::endl;
+    for (int i = 0; i < arraySize; ++i) {
+        tempProducts[i] = products[rateIndex[i].index];
     }
 
-    // Изменение значения силы и соответствующего индекса
+    for (int i = 0; i < arraySize; ++i) {
+
+        products[i] = tempProducts[i];
+        rateIndex[i].index = i;
+        priceIndex[i].index = i;
+        rateIndex[i].rate = products[i].rate;
+        
+        std::cout << "Название: " << products[i].name << ", Цена: " << products[i].price <<
+            ", Рейтинг: " << products[i].rate << ", ID: " << products[i].id << std::endl;
+    }
+
+    // Изменение значения цены и соответствующего индекса
     std::cout << "\n****************************" << std::endl;
     std::cout << "Изменение массива индексов для цены" << std::endl;
     std::cout << "**************************** \n" << std::endl;
     EditPriceRecord(products, priceIndex, arraySize, 4, 324);
     PrintArray(products, arraySize);
 
-    // Изменение значения уровня и соответствующего индекса
+    // Изменение значения рейтинга и соответствующего индекса
     std::cout << "\n****************************" << std::endl;
     std::cout << "Изменение массива индексов для рейтинга" << std::endl;
     std::cout << "**************************** \n" << std::endl;
     RateRecord(products, rateIndex, arraySize, 4, 10000);
     PrintArray(products, arraySize);
 
-    // Удаление записи по ключу из массива покемонов и массива индексов для силы
+    // Удаление записи по ключу из массива товаров и массива индексов для цены
     std::cout << "\n****************************" << std::endl;
     std::cout << "Удаление массива индексов для цены" << std::endl;
     std::cout << "**************************** \n" << std::endl;
     RemoveRecordByKey(products, priceIndex, arraySize, 0);
     PrintArray(products, arraySize);
 
-    // Удаление записи по ключу из массива покемонов и массива индексов для уровня
+    // Удаление записи по ключу из массива товаров и массива индексов для рейтинга
 
     std::cout << "\n****************************" << std::endl;
     std::cout << "Удаление массива индексов для рейтинга" << std::endl;
@@ -498,10 +509,11 @@ int main() {
     DeleteRateRecord(products, rateIndex, arraySize, 2);
     PrintArray(products, arraySize);
 
-    // Освобождение памяти, выделенной для массивов покемонов и индексов
+    // Освобождение памяти, выделенной для массивов товаров и индексов
     delete[] products;
     delete[] priceIndex;
     delete[] rateIndex;
+    std::cout << "ЗАДАНИЕ 2 \n" << std::endl;
 
     //
     // 
@@ -511,7 +523,7 @@ int main() {
     // 
 
     Product products1[50];
-    int size = 50; // ???????????
+    int size = 10; // ???????????
     RandomInputData(products1, size);
 
     //Создаем индекс по цене
@@ -605,6 +617,7 @@ int main() {
     // 
     // 
 
+    std::cout << "ЗАДАНИЕ 3 \n" << std::endl;
 
     Node* head = nullptr; // Указатель на начало списка
     int amount;
